@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Samadhan Kendra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Apply Inter font family to the entire body */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f8f9fa; /* Light grey background for the page */
+        }
+
+        /* Custom styling for the three-dot menu icon to match other icons */
+        .three-dots-icon {
+            font-size: 1.25rem; /* Equivalent to text-xl */
+            color: #5f6368; /* A standard gray color for icons */
+        }
+
+        /* Dropdown specific styles for desktop (hover) */
+        .dropdown-menu {
+            position: absolute;
+            background-color: white;
+            /* Stronger shadow for better visual depth */
+            box-shadow: 0px 10px 20px 0px rgba(0,0,0,0.15);
+            z-index: 1000; /* Ensure dropdown is on top of other content */
+            min-width: 180px; /* Slightly wider dropdowns */
+            border-radius: 0.5rem; /* More rounded corners */
+            overflow: hidden; /* Ensures content stays within rounded corners */
+            padding: 0.5rem 0; /* Vertical padding */
+            opacity: 0; /* Initially hidden */
+            visibility: hidden; /* Initially hidden */
+            /* Smooth transition for appearance */
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px); /* Slight downward translation for entrance effect */
+            top: 100%; /* Position below the parent link */
+            left: 0;
+            border: 1px solid #e2e8f0; /* Subtle border */
+        }
+
+        /* Class to show the dropdown */
+        .show-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0); /* Reset translation to show */
+        }
+
+        /* Styling for individual dropdown items */
+        .dropdown-item {
+            padding: 0.75rem 1.25rem; /* More padding for better click/tap area */
+            display: block;
+            color: #4a5568; /* Darker gray for text */
+            text-decoration: none;
+            font-size: 0.9rem; /* Slightly larger font size */
+            white-space: nowrap; /* Prevent text wrapping */
+            transition: background-color 0.2s ease, color 0.2s ease; /* Smooth hover transition */
+        }
+
+        .dropdown-item:hover {
+            background-color: #e0f2fe; /* Light blue background on hover */
+            color: #1d4ed8; /* Darker blue text on hover */
+        }
+
+        /* Custom style for the mobile menu transition */
+        #mobileMenu, #mobileSearchOverlay {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Password Modal Styling */
+        .password-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        .password-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+            width: 90%;
+            max-width: 400px; /* Max width for larger screens */
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.2s ease-out;
+        }
+
+        .password-modal-content.show {
+            transform: scale(1);
+        }
+
+        .password-modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #d1d5db; /* Light gray border */
+            border-radius: 0.375rem; /* Slightly rounded corners */
+            font-size: 1rem;
+        }
+
+        .password-modal-content button {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .password-modal-content button.submit {
+            background-color: #2563eb; /* Blue */
+            color: white;
+        }
+
+        .password-modal-content button.submit:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
+        }
+
+        .password-modal-content button.cancel {
+            background-color: #e5e7eb; /* Light gray */
+            color: #374151; /* Darker gray text */
+            margin-left: 0.75rem;
+        }
+
+        .password-modal-content button.cancel:hover {
+            background-color: #d1d5db; /* Darker light gray on hover */
+        }
+
+        .password-error {
+            color: #ef4444; /* Red for error messages */
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        /* Styles for the embedded iframe */
+        .embedded-webapp-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh; /* Ensures it takes up a good portion of the viewport */
+            padding: 1rem;
+        }
+        .embedded-webapp-iframe {
+            width: 100%;
+            height: 80vh; /* Adjust height as needed, or use a fixed height */
+            border: 1px solid #e2e8f0; /* Subtle border */
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+
+        /* Responsive adjustments for iframe */
+        @media (min-width: 768px) {
+            .embedded-webapp-iframe {
+                max-width: 90%; /* Max width on larger screens */
+            }
+        }
+        @media (min-width: 1024px) {
+            .embedded-webapp-iframe {
+                max-width: 80%; /* Even narrower on very large screens for better readability */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-lg py-4 px-6 flex items-center justify-between w-full border-b border-gray-200 rounded-b-lg">
+        <div class="flex items-center space-x-8">
+            <!-- Logo linked to index.html -->
+            <a href="index.html" class="inline-block">
+                <img src="https://i.postimg.cc/nrW2HNXp/samadhan-kendra-logo.png" alt="Samadhan Kendra Logo" class="h-8 mr-4">
+            </a>
+
+            <nav class="hidden lg:flex items-center space-x-8 text-gray-700 text-base font-medium">
+                <a href="index.html" class="hover:text-blue-700 transition-colors duration-200">Home</a>
+
+                <div class="relative dropdown" id="aboutUsDropdown">
+                    <a href="#" class="hover:text-blue-700 flex items-center transition-colors duration-200" aria-haspopup="true" aria-expanded="false">
+                        About us
+                        <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="ourjourney.html" class="dropdown-item">Our Journey</a>
+                        <a href="vision.html" class="dropdown-item">Vision</a>
+                        <a href="mission.html" class="dropdown-item">Mission</a>
+                        <a href="management_structure.html" class="dropdown-item">Management And Administrative structure</a>
+                    </div>
+                </div>
+
+                <div class="relative dropdown" id="programsDropdown">
+                    <a href="#" class="hover:text-blue-700 flex items-center transition-colors duration-200" aria-haspopup="true" aria-expanded="false">
+                        Programs
+                        <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="su_sikshalaya.html" class="dropdown-item">SU-SIKSHALAYA</a>
+                        <a href="apna_vidyalaya.html" class="dropdown-item">Apna Vidyalaya</a>
+                        <a href="sports.html" class="dropdown-item">Sports</a>
+                        <a href="wsg.html" class="dropdown-item">WSG</a>
+                        <a href="environment.html" class="dropdown-item">Environment</a>
+                    </div>
+                </div>
+
+                <a href="founder.html" class="hover:text-blue-700 transition-colors duration-200">Founder</a>
+                <a href="gallery.html" class="hover:text-blue-700 transition-colors duration-200">Gallery</a>
+            </nav>
+        </div>
+
+        <div id="desktopSearchBar" class="hidden lg:flex items-center flex-grow mx-4 max-w-xl
+                                     bg-white rounded-full shadow-md hover:shadow-lg
+                                     transition-shadow duration-300 p-2">
+            <i class="fas fa-search text-gray-500 ml-2 mr-2 text-base"></i>
+            <input type="text" id="desktopSearchInput"
+                   class="bg-transparent outline-none text-gray-800 placeholder-gray-500 flex-grow text-base"
+                   placeholder="Search User Name">
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <nav class="hidden md:flex items-center space-x-6 text-gray-700 text-base font-medium lg:block">
+                <a href="download.html" class="hover:text-blue-700 transition-colors duration-200">Download</a>
+                <a href="contact.html" class="hover:text-blue-700 transition-colors duration-200">Contact</a>
+                <a href="https://mysamadhan.in/iadmin" id="consoleLink" class="hover:text-blue-700 transition-colors duration-200">Console</a>
+            </nav>
+
+            <button class="p-2.5 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 hidden lg:block cursor-pointer transition-colors duration-200" aria-label="More options">
+                <i class="fas fa-ellipsis-v three-dots-icon text-blue-600"></i>
+            </button>
+
+            <button id="mobileSearchToggleButton" class="p-2.5 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 lg:hidden cursor-pointer transition-colors duration-200" aria-label="Open mobile search">
+                <i class="fas fa-search text-blue-600"></i>
+            </button>
+
+            <button id="mobileMenuButton" class="p-2.5 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:hidden cursor-pointer" aria-label="Open mobile menu">
+                <i class="fas fa-bars text-gray-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Embedded Google Apps Script Web App -->
+    <div class="embedded-webapp-container">
+        <iframe
+            src="https://script.google.com/macros/s/AKfycbz_iaF0BBi-jIQhUYqZPXw9DDR61ny5xQNNRG_bXBNK8MXVFaoHXRr-LXmHxdx-9EzgQQ/exec"
+            title="Samadhan Kendra Web App"
+            class="embedded-webapp-iframe"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+    </div>
+
+    <div id="mobileSearchOverlay" class="fixed inset-0 bg-white z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="flex justify-end p-6">
+            <button id="closeMobileSearchButton" class="text-gray-600 hover:text-gray-900 focus:outline-none cursor-pointer transition-colors duration-200" aria-label="Close mobile search">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="p-6 flex flex-col items-center justify-center h-full -mt-16"> <h2 class="text-3xl font-bold text-blue-600 mb-6">Search</h2>
+            <div class="relative flex items-center w-full max-w-md
+                                 bg-white rounded-full shadow-md hover:shadow-lg
+                                 transition-shadow duration-300 p-3">
+                <i class="fas fa-search text-gray-500 ml-2 mr-3 text-lg"></i>
+                <input type="text" id="mobileSearchInput"
+                       class="bg-transparent outline-none text-gray-800 placeholder-gray-500 flex-grow text-lg"
+                       placeholder="Enter User Name (exact)">
+            </div>
+        </div>
+    </div>
+
+    <div id="mobileMenu" class="fixed inset-0 bg-white z-50 transform translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+        <div class="flex justify-end p-6">
+            <button id="closeMobileMenuButton" class="text-gray-600 hover:text-gray-900 focus:outline-none cursor-pointer transition-colors duration-200" aria-label="Close mobile menu">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col items-start p-6 space-y-3 text-gray-800 text-lg font-medium">
+            <a href="index.html" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Home</a>
+
+            <div class="w-full">
+                <button class="flex items-center justify-between w-full py-3 px-4 text-left hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer hover:text-blue-600" id="mobileAboutUsToggle" aria-haspopup="true" aria-expanded="false">
+                    About us
+                    <i class="fas fa-chevron-down ml-2 text-sm transition-transform duration-200"></i>
+                </button>
+                <div class="pl-6 mt-2 space-y-2 hidden bg-gray-50 rounded-md py-2" id="mobileAboutUsMenu">
+                    <a href="ourjourney.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Our Journey</a>
+                    <a href="vision.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Vision</a>
+                    <a href="mission.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Mission</a>
+                    <a href="management_structure.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Management And Administrative structure</a>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <button class="flex items-center justify-between w-full py-3 px-4 text-left hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer hover:text-blue-600" id="mobileProgramsToggle" aria-haspopup="true" aria-expanded="false">
+                    Programs
+                    <i class="fas fa-chevron-down ml-2 text-sm transition-transform duration-200"></i>
+                </button>
+                <div class="pl-6 mt-2 space-y-2 hidden bg-gray-50 rounded-md py-2" id="mobileProgramsMenu">
+                    <a href="su_sikshalaya.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">SU-SIKSHALAYA</a>
+                    <a href="apna_vidyalaya.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Apna Vidyalaya</a>
+                    <a href="sports.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Sports</a>
+                    <a href="wsg.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">WSG</a>
+                    <a href="environment.html" class="block py-2 px-4 text-base hover:bg-gray-100 rounded-md transition-colors duration-200 hover:text-blue-600">Environment</a>
+                </div>
+            </div>
+
+            <a href="founder.html" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Founder</a>
+            <a href="gallery.html" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Gallery</a>
+
+            <a href="download.html" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Download</a>
+            <a href="contact.html" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Contact</a>
+            <a href="https://mysamadhan.in/iadmin" id="mobileConsoleLink" class="hover:bg-gray-100 rounded-md w-full py-3 px-4 transition-colors duration-200 hover:text-blue-600">Console</a>
+
+            </nav>
+    </div>
+
+    
+
+    <div id="passwordModal" class="password-modal-overlay hidden">
+        <div class="password-modal-content">
+            <h3 class="text-2xl font-semibold mb-4 text-gray-800">Enter Password</h3>
+            <input type="password" id="passwordInput" placeholder="Password" class="mb-4">
+            <p id="passwordError" class="password-error hidden"></p>
+            <div class="flex justify-center">
+                <button id="submitPasswordButton" class="submit">Submit</button>
+                <button id="cancelPasswordButton" class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // The URL of your published Google Sheet CSV
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSP57XIVtj9TV3s-ix5FQs_5CDB4nCWO_fQUmTyundV47OYNGY-y9mfJgf-9Y7-JtAVz7Ze_om8LTeG/pub?output=csv';
+        const CORRECT_PASSWORD = 'admin123'; // Define the correct password here
+
+        let sheetData = []; // To store the parsed CSV data
+
+        // Function to fetch and parse the CSV data
+        async function fetchCSVData() {
+            try {
+                const response = await fetch(CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                sheetData = parseCSV(csvText);
+                console.log('CSV Data Loaded:', sheetData); // Log the loaded data
+            } catch (error) {
+                console.error('Error fetching or parsing CSV:', error);
+            }
+        }
+
+        // Simple CSV parser function
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) return [];
+
+            const headers = lines[0].split(',').map(header => header.trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(value => value.trim());
+                if (values.length === headers.length) {
+                    let row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index];
+                    });
+                    data.push(row);
+                } else {
+                    console.warn(`Skipping malformed row: ${lines[i]} (expected ${headers.length} columns, got ${values.length})`);
+                }
+            }
+            return data;
+        }
+
+        // Function to handle the search
+        function performSearch(searchInput) {
+            const searchTerm = searchInput.value.trim();
+
+            if (searchTerm === '') {
+                return;
+            }
+
+            console.log('Searching for:', searchTerm);
+            console.log('Current sheetData:', sheetData);
+
+            const userNameColumn = 'User Name';
+            const webLinkColumn = 'WEB LINK';
+
+            let foundLink = null;
+
+            for (const row of sheetData) {
+                if (row[userNameColumn] !== undefined && row[webLinkColumn] !== undefined) {
+                    if (row[userNameColumn].toLowerCase() === searchTerm.toLowerCase()) {
+                        foundLink = row[webLinkColumn];
+                        break;
+                    }
+                }
+            }
+
+            if (foundLink) {
+                if (!foundLink.startsWith('http://') && !foundLink.startsWith('https://')) {
+                    foundLink = 'https://' + foundLink;
+                }
+                console.log('Attempting to open link in new tab:', foundLink);
+
+                try {
+                    window.open(foundLink, '_blank');
+                } catch (e) {
+                    console.error('Error opening window (possibly pop-up blocked):', e);
+                }
+
+            } else {
+                console.log('No link found for:', searchTerm);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Desktop dropdown logic (hover)
+            const dropdownTimeouts = {};
+
+            function setupDropdown(dropdownId, menuClass) {
+                const dropdown = document.getElementById(dropdownId);
+                if (dropdown) {
+                    const toggleLink = dropdown.querySelector('a[aria-haspopup="true"]');
+                    const menu = dropdown.querySelector(`.${menuClass}`);
+
+                    if (menu && toggleLink) {
+                        dropdown.addEventListener('mouseenter', () => {
+                            if (dropdownTimeouts[dropdownId]) {
+                                clearTimeout(dropdownTimeouts[dropdownId]);
+                            }
+                            menu.classList.add('show-menu');
+                            toggleLink.setAttribute('aria-expanded', 'true');
+                        });
+
+                        dropdown.addEventListener('mouseleave', () => {
+                            dropdownTimeouts[dropdownId] = setTimeout(() => {
+                                menu.classList.remove('show-menu');
+                                toggleLink.setAttribute('aria-expanded', 'false');
+                            }, 150);
+                        });
+
+                        menu.addEventListener('mouseenter', () => {
+                            if (dropdownTimeouts[dropdownId]) {
+                                clearTimeout(dropdownTimeouts[dropdownId]);
+                            }
+                        });
+
+                        menu.addEventListener('mouseleave', () => {
+                            dropdownTimeouts[dropdownId] = setTimeout(() => {
+                                menu.classList.remove('show-menu');
+                                toggleLink.setAttribute('aria-expanded', 'false');
+                            }, 150);
+                        });
+                    }
+                }
+            }
+
+            setupDropdown('aboutUsDropdown', 'dropdown-menu');
+            setupDropdown('programsDropdown', 'dropdown-menu');
+
+            // Mobile menu logic (click)
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const closeMobileMenuButton = document.getElementById('closeMobileMenuButton');
+
+            if (mobileMenuButton && mobileMenu && closeMobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.remove('translate-x-full');
+                    mobileMenu.classList.add('translate-x-0');
+                    mobileMenuButton.setAttribute('aria-expanded', 'true');
+                });
+
+                closeMobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.remove('translate-x-0');
+                    mobileMenu.classList.add('translate-x-full');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            // Mobile dropdowns (click)
+            function setupMobileDropdownToggle(toggleId, menuId) {
+                const toggleButton = document.getElementById(toggleId);
+                const menu = document.getElementById(menuId);
+
+                if (toggleButton && menu) {
+                    toggleButton.addEventListener('click', () => {
+                        const isHidden = menu.classList.toggle('hidden');
+                        const icon = toggleButton.querySelector('i');
+                        if (icon) {
+                            icon.classList.toggle('fa-chevron-down');
+                            icon.classList.toggle('fa-chevron-up');
+                        }
+                        toggleButton.setAttribute('aria-expanded', !isHidden);
+                    });
+                }
+            }
+
+            setupMobileDropdownToggle('mobileAboutUsToggle', 'mobileAboutUsMenu');
+            setupMobileDropdownToggle('mobileProgramsToggle', 'mobileProgramsMenu');
+
+            // --- Search Functionality Integration ---
+
+            // Desktop Search Elements
+            const desktopSearchInput = document.getElementById('desktopSearchInput');
+
+            // Mobile Search Elements
+            const mobileSearchToggleButton = document.getElementById('mobileSearchToggleButton');
+            const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+            const closeMobileSearchButton = document.getElementById('closeMobileSearchButton');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+            // Event Listeners for Desktop Search Input (Enter key)
+            if (desktopSearchInput) {
+                desktopSearchInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        performSearch(desktopSearchInput);
+                    }
+                });
+            }
+
+            // Event Listeners for Mobile Search Overlay (Open/Close)
+            if (mobileSearchToggleButton && mobileSearchOverlay && closeMobileSearchButton) {
+                mobileSearchToggleButton.addEventListener('click', () => {
+                    mobileSearchOverlay.classList.remove('translate-x-full');
+                    mobileSearchOverlay.classList.add('translate-x-0');
+                    mobileSearchToggleButton.setAttribute('aria-expanded', 'true');
+                    mobileSearchInput.focus();
+                });
+
+                closeMobileSearchButton.addEventListener('click', () => {
+                    mobileSearchOverlay.classList.remove('translate-x-0');
+                    mobileSearchOverlay.classList.add('translate-x-full');
+                    mobileSearchToggleButton.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            // Event Listeners for Mobile Search Input (Enter key)
+            if (mobileSearchInput) {
+                mobileSearchInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        performSearch(mobileSearchInput);
+                    }
+                });
+            }
+
+            // --- Password Protected Console Link ---
+            const consoleLink = document.getElementById('consoleLink');
+            const mobileConsoleLink = document.getElementById('mobileConsoleLink');
+            const passwordModal = document.getElementById('passwordModal');
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordError = document.getElementById('passwordError');
+            const submitPasswordButton = document.getElementById('submitPasswordButton');
+            const cancelPasswordButton = document.getElementById('cancelPasswordButton');
+
+            function handleConsoleAccess(event) {
+                event.preventDefault(); // Prevent default link navigation
+                passwordModal.classList.remove('hidden');
+                passwordError.classList.add('hidden'); // Hide any previous errors
+                passwordInput.value = ''; // Clear input field
+                passwordInput.focus(); // Focus the input for immediate typing
+            }
+
+            function attemptPasswordLogin() {
+                const enteredPassword = passwordInput.value;
+                if (enteredPassword === CORRECT_PASSWORD) {
+                    passwordModal.classList.add('hidden');
+                    passwordInput.value = '';
+                    window.location.href = 'https://mysamadhan.in/iadmin'; // Redirect to the console
+                } else {
+                    passwordError.textContent = 'Incorrect password. Please try again.';
+                    passwordError.classList.remove('hidden');
+                    passwordInput.value = ''; // Clear input on incorrect password
+                    passwordInput.focus();
+                }
+            }
+
+            if (consoleLink) {
+                consoleLink.addEventListener('click', handleConsoleAccess);
+            }
+            if (mobileConsoleLink) {
+                mobileConsoleLink.addEventListener('click', handleConsoleAccess);
+            }
+
+            if (submitPasswordButton) {
+                submitPasswordButton.addEventListener('click', attemptPasswordLogin);
+            }
+
+            if (cancelPasswordButton) {
+                cancelPasswordButton.addEventListener('click', () => {
+                    passwordModal.classList.add('hidden');
+                    passwordInput.value = '';
+                    passwordError.classList.add('hidden');
+                });
+            }
+
+            // Allow submitting password with Enter key
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        attemptPasswordLogin();
+                    }
+                });
+            }
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !passwordModal.classList.contains('hidden')) {
+                    passwordModal.classList.add('hidden');
+                    passwordInput.value = '';
+                    passwordError.classList.add('hidden');
+                }
+            });
+
+            // Initial fetch when the page loads to populate sheetData
+            fetchCSVData();
+        });
+    </script>
+</body>
+</html>

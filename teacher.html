@@ -9,10 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* Lighter background for a cleaner feel */
-        }
-        .container {
-            max-width: 100%;
+            background-color: #f1f5f9;
         }
         .modal {
             display: none;
@@ -58,9 +55,9 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen p-4 md:p-8">
+<body class="flex flex-col items-center min-h-screen">
 
-    <div class="container bg-white p-6 md:p-8 rounded-2xl shadow-xl w-full">
+    <div class="bg-white py-6 px-4 md:py-8 md:px-8 w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6">
             <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left mb-4 md:mb-0">Teacher Management System</h1>
             <button id="addTeacherBtn" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
@@ -98,38 +95,38 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Filter and Table Section -->
-        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mt-6">
-            <div class="flex justify-end mb-4">
-                <select id="blockFilter" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                    <option value="All">Filter by Block</option>
-                    <option value="BIDUPUR">BIDUPUR</option>
-                    <option value="RAGHOPUR">RAGHOPUR</option>
-                </select>
-            </div>
+    <!-- Filter and Table Section -->
+    <div class="bg-white py-6 px-4 md:py-8 md:px-8 mt-6 w-full">
+        <div class="flex justify-end mb-4">
+            <select id="blockFilter" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <option value="All">Filter by Block</option>
+                <option value="BIDUPUR">BIDUPUR</option>
+                <option value="RAGHOPUR">RAGHOPUR</option>
+            </select>
+        </div>
 
-            <!-- Status Message Box -->
-            <div id="statusMessage" class="mt-4 p-4 rounded-lg text-center hidden" role="alert"></div>
+        <!-- Status Message Box -->
+        <div id="statusMessage" class="mt-4 p-4 rounded-lg text-center hidden" role="alert"></div>
 
-            <!-- Data List Section (Table) -->
-            <div class="data-list-container w-full overflow-x-auto">
-                <p id="loadingMessage" class="text-center text-gray-500 py-8">Loading data...</p>
-                <table id="dataTable" class="min-w-full divide-y divide-gray-200 hidden">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Father/Husband Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact No</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Block</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Data rows will be inserted here -->
-                    </tbody>
-                </table>
-            </div>
+        <!-- Data List Section (Table) -->
+        <div class="data-list-container w-full overflow-x-auto">
+            <p id="loadingMessage" class="text-center text-gray-500 py-8">Loading data...</p>
+            <table id="dataTable" class="min-w-full divide-y divide-gray-200 hidden">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Father/Husband Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Block</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Data rows will be inserted here -->
+                </tbody>
+            </table>
         </div>
     </div>
     

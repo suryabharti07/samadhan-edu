@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Data Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Lighter background for a cleaner feel */
+        }
+        .container {
+            max-width: 100%;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #6b7280;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #1f2937;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen p-4 md:p-8">
+
+    <div class="container bg-white p-6 md:p-8 rounded-2xl shadow-xl w-full">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left mb-4 md:mb-0">Teacher Management System</h1>
+            <button id="addTeacherBtn" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Add Teacher
+            </button>
+        </div>
+        
+        <!-- Search Bar and Data Boxes -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+            <div class="relative w-full lg:w-1/2 order-2 lg:order-1">
+                <input type="text" id="searchBox" placeholder="Search by name..." class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div class="flex flex-col lg:flex-row items-center gap-6 w-full lg:w-auto order-1 lg:order-2">
+                <!-- Total Teachers Box -->
+                <div class="bg-indigo-50 p-4 rounded-xl shadow-md w-full md:w-auto text-center md:text-left flex-1">
+                    <p class="text-lg font-semibold text-indigo-800">Total Teachers</p>
+                    <p id="totalCount" class="text-4xl font-extrabold text-indigo-600 mt-1">0</p>
+                </div>
+                <!-- Block-specific Boxes -->
+                <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto flex-1">
+                    <div class="bg-blue-50 p-3 rounded-xl shadow-md flex-1">
+                        <p class="text-sm font-semibold text-blue-800">BIDUPUR</p>
+                        <p id="bidupurCount" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl shadow-md flex-1">
+                        <p class="text-sm font-semibold text-emerald-800">RAGHOPUR</p>
+                        <p id="raghopurCount" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter and Table Section -->
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mt-6">
+            <div class="flex justify-end mb-4">
+                <select id="blockFilter" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <option value="All">Filter by Block</option>
+                    <option value="BIDUPUR">BIDUPUR</option>
+                    <option value="RAGHOPUR">RAGHOPUR</option>
+                </select>
+            </div>
+
+            <!-- Status Message Box -->
+            <div id="statusMessage" class="mt-4 p-4 rounded-lg text-center hidden" role="alert"></div>
+
+            <!-- Data List Section (Table) -->
+            <div class="data-list-container w-full overflow-x-auto">
+                <p id="loadingMessage" class="text-center text-gray-500 py-8">Loading data...</p>
+                <table id="dataTable" class="min-w-full divide-y divide-gray-200 hidden">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Father/Husband Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Block</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Data rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Form Modal -->
+    <div id="addFormModal" class="modal">
+        <div class="modal-content">
+            <span id="closeFormBtn" class="close-btn">&times;</span>
+            <h2 id="formTitle" class="text-2xl font-bold text-center text-gray-800 mb-4">Add New Teacher</h2>
+            <form id="dataForm" class="space-y-4">
+                <input type="hidden" id="editRowId" name="editRowId">
+                
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <input type="text" id="name" name="NAME" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Father/Husband Name</label>
+                    <div class="flex space-x-2">
+                        <select id="relation" name="relation" class="w-1/4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                            <option value="W/O">W/O</option>
+                            <option value="D/O">D/O</option>
+                            <option value="S/O">S/O</option>
+                        </select>
+                        <input type="text" id="fatherHusbandNameInput" required class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Enter name">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="contactNo" class="block text-sm font-medium text-gray-700 mb-1">Contact No</label>
+                    <input type="text" id="contactNo" name="CONTACT NO" required maxlength="10" pattern="[0-9]{10}" title="Please enter exactly 10 digits" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+
+                <div>
+                    <label for="block" class="block text-sm font-medium text-gray-700 mb-1">Block</label>
+                    <select id="block" name="BLOCK" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        <option value="BIDUPUR">BIDUPUR</option>
+                        <option value="RAGHOPUR">RAGHOPUR</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-button w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 mt-4">
+                    Add Entry
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <p class="text-lg font-semibold text-gray-800 mb-4">Are you sure you want to delete this entry?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancelDeleteBtn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors">Cancel</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('dataForm');
+            const editRowId = document.getElementById('editRowId');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const dataTable = document.getElementById('dataTable');
+            const tableBody = document.getElementById('tableBody');
+            const confirmModal = document.getElementById('confirmModal');
+            const addFormModal = document.getElementById('addFormModal');
+            const addTeacherBtn = document.getElementById('addTeacherBtn');
+            const closeFormBtn = document.getElementById('closeFormBtn');
+            const formTitle = document.getElementById('formTitle');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const searchBox = document.getElementById('searchBox');
+            const blockFilter = document.getElementById('blockFilter');
+            const totalCount = document.getElementById('totalCount');
+            const bidupurCount = document.getElementById('bidupurCount');
+            const raghopurCount = document.getElementById('raghopurCount');
+
+            let allData = [];
+
+            // IMPORTANT: This URL has been updated with the link you provided.
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUr_NyLdImpepoZ_eGq5ymHAFFU5EZ2thtoQGnqb2_sRZ3cf_YvVs2isie8Eay48161w/exec';
+
+            // --- Event Listeners for Modals ---
+            addTeacherBtn.addEventListener('click', () => {
+                form.reset();
+                editRowId.value = '';
+                submitBtn.textContent = 'Add Entry';
+                formTitle.textContent = 'Add New Teacher';
+                addFormModal.style.display = 'flex';
+            });
+
+            closeFormBtn.addEventListener('click', () => {
+                addFormModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === addFormModal) {
+                    addFormModal.style.display = 'none';
+                }
+            });
+            
+            // --- Search Functionality & Block Filter ---
+            searchBox.addEventListener('keyup', applyFilters);
+            blockFilter.addEventListener('change', applyFilters);
+
+            function applyFilters() {
+                const searchTerm = searchBox.value.toLowerCase();
+                const selectedBlock = blockFilter.value;
+
+                const filteredData = allData.filter(row => {
+                    const matchesSearch = row[0].toLowerCase().includes(searchTerm) || 
+                                          row[1].toLowerCase().includes(searchTerm);
+                    const matchesBlock = selectedBlock === 'All' || row[3] === selectedBlock;
+                    return matchesSearch && matchesBlock;
+                });
+                renderData(filteredData);
+            }
+
+            // --- Form Submission Logic (Create & Update) ---
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!form.reportValidity()) {
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+                
+                const name = document.getElementById('name').value;
+                const relation = document.getElementById('relation').value;
+                const fatherHusbandNameInput = document.getElementById('fatherHusbandNameInput').value;
+                const contactNo = document.getElementById('contactNo').value;
+                const block = document.getElementById('block').value;
+
+                const combinedFatherHusbandName = `${relation} ${fatherHusbandNameInput}`;
+
+                const data = {
+                    'NAME': name,
+                    'FATHER/HUSBAND NAME': combinedFatherHusbandName,
+                    'CONTACT NO': contactNo,
+                    'BLOCK': block
+                };
+                
+                const isUpdate = editRowId.value !== '';
+                let action = isUpdate ? 'edit' : 'add';
+
+                if (isUpdate) {
+                    data.rowId = editRowId.value;
+                }
+
+                try {
+                    await fetch(`${SCRIPT_URL}?action=${action}`, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    showMessage(`Success! Entry ${isUpdate ? 'updated' : 'added'} to the sheet.`, 'bg-green-100 text-green-700');
+                    addFormModal.style.display = 'none';
+                    form.reset();
+                    editRowId.value = '';
+                    submitBtn.textContent = 'Add Entry';
+                    fetchData();
+                } catch (error) {
+                    console.error('Submission failed:', error);
+                    showMessage('Error! Could not add the entry.', 'bg-red-100 text-red-700');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // --- Data Fetching and Display Logic (JSONP approach) ---
+            window.handleData = function(data) {
+                loadingMessage.style.display = 'none';
+                if (data.data && data.data.length > 1) {
+                    allData = data.data.slice(1);
+                    updateDataCounts(allData);
+                    applyFilters(); // Apply filters to the newly fetched data
+                    dataTable.classList.remove('hidden');
+                } else {
+                    allData = [];
+                    updateDataCounts(allData);
+                    console.error('No data received from script.');
+                    loadingMessage.textContent = 'No data entries found.';
+                    loadingMessage.style.display = 'block';
+                    dataTable.classList.add('hidden');
+                }
+            };
+            
+            async function fetchData() {
+                loadingMessage.textContent = 'Loading data...';
+                const script = document.createElement('script');
+                // The `callback` parameter is crucial for the JSONP technique
+                script.src = `${SCRIPT_URL}?action=get&callback=handleData`;
+                document.body.appendChild(script);
+                document.body.removeChild(script);
+            }
+
+            function updateDataCounts(dataRows) {
+                const totalTeachers = dataRows.length;
+                const bidupurTeachers = dataRows.filter(row => row[3] === 'BIDUPUR').length;
+                const raghopurTeachers = dataRows.filter(row => row[3] === 'RAGHOPUR').length;
+                
+                totalCount.textContent = totalTeachers;
+                bidupurCount.textContent = bidupurTeachers;
+                raghopurCount.textContent = raghopurTeachers;
+            }
+
+            function renderData(dataRows) {
+                tableBody.innerHTML = '';
+                if (!dataRows || dataRows.length === 0) {
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = `<td colspan="5" class="px-6 py-4 text-center text-gray-500">No matching entries found.</td>`;
+                    tableBody.appendChild(noDataRow);
+                    return;
+                }
+                
+                dataRows.forEach((row, index) => {
+                    // The row ID needs to be recalculated based on its original position in the full dataset.
+                    const originalIndex = allData.findIndex(item => item === row);
+                    const rowId = originalIndex + 2; 
+                    const tableRow = document.createElement('tr');
+                    tableRow.className = 'hover:bg-gray-100 transition-colors duration-200';
+                    
+                    tableRow.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">${row[0]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${row[1]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${row[2]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${row[3]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button data-row-id="${rowId}" class="edit-btn text-yellow-600 hover:text-yellow-900 transition-colors duration-200 mr-4">Edit</button>
+                            <button data-row-id="${rowId}" class="delete-btn text-red-600 hover:text-red-900 transition-colors duration-200">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tableRow);
+                });
+                
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => handleEdit(e.target.dataset.rowId));
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => showConfirmModal(e.target.dataset.rowId));
+                });
+            }
+
+            // --- Edit & Delete Logic ---
+            function handleEdit(rowId) {
+                const rowIndex = parseInt(rowId) - 2;
+                const rowData = allData[rowIndex];
+
+                const combinedName = rowData[1];
+                const parts = combinedName.split(' ');
+                const relation = parts[0];
+                const name = parts.slice(1).join(' ');
+
+                document.getElementById('name').value = rowData[0];
+                document.getElementById('relation').value = relation;
+                document.getElementById('fatherHusbandNameInput').value = name;
+                document.getElementById('contactNo').value = rowData[2];
+                document.getElementById('block').value = rowData[3];
+                
+                editRowId.value = rowId;
+                
+                submitBtn.textContent = 'Update Entry';
+                formTitle.textContent = 'Edit Teacher Data';
+                addFormModal.style.display = 'flex';
+            }
+
+            function showConfirmModal(rowId) {
+                pendingDeleteRowId = rowId;
+                confirmModal.style.display = 'flex';
+            }
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                confirmModal.style.display = 'none';
+                pendingDeleteRowId = null;
+            });
+
+            confirmDeleteBtn.addEventListener('click', async () => {
+                confirmModal.style.display = 'none';
+                if (pendingDeleteRowId) {
+                    await handleDelete(pendingDeleteRowId);
+                    pendingDeleteRowId = null;
+                }
+            });
+
+            async function handleDelete(rowId) {
+                showMessage('Deleting...', 'bg-gray-100 text-gray-700');
+                
+                try {
+                    await fetch(`${SCRIPT_URL}?action=delete&rowId=${rowId}`, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                    });
+                    
+                    showMessage('Entry deleted successfully.', 'bg-green-100 text-green-700');
+                    fetchData();
+                } catch (error) {
+                    console.error('Deletion failed:', error);
+                    showMessage('Error! Could not delete the entry.', 'bg-red-100 text-red-700');
+                }
+            }
+
+            function showMessage(message, colorClass) {
+                statusMessage.textContent = message;
+                statusMessage.className = `mt-6 p-4 rounded-lg text-center ${colorClass}`;
+                statusMessage.classList.remove('hidden');
+                setTimeout(() => {
+                  statusMessage.classList.add('hidden');
+                }, 3000);
+            }
+
+            fetchData();
+        });
+    </script>
+</body>
+</html>
